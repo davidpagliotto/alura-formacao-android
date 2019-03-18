@@ -2,13 +2,17 @@ package br.com.alura.ceep.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -23,13 +27,18 @@ import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_POSICAO;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_NOTA;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_GRID;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_KEY;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_LINEAR;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.POSICAO_INVALIDA;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.PREFERENCIAS;
 
 public class ListaNotasActivity extends AppCompatActivity {
 
-
     public static final String TITULO_APPBAR = "Notas";
     private ListaNotasAdapter adapter;
+    private RecyclerView listaNotas;
+    private Menu menuActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +98,55 @@ public class ListaNotasActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_formulario_lista_salva, menu);
+        menuActivity = menu;
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (recuperarLayoutPreferido().equals(LAYOUT_LINEAR)) {
+            menu.findItem(R.id.menu_formulario_lista_ic_linear).setVisible(false);
+            menu.findItem(R.id.menu_formulario_lista_ic_grid).setVisible(true);
+        }
+        else {
+            menu.findItem(R.id.menu_formulario_lista_ic_linear).setVisible(true);
+            menu.findItem(R.id.menu_formulario_lista_ic_grid).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.menu_formulario_lista_ic_grid) {
+            listaNotas.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+            gravaLayoutPreferido(LAYOUT_GRID);
+        } else if (item.getItemId() == R.id.menu_formulario_lista_ic_linear) {
+            listaNotas.setLayoutManager(new LinearLayoutManager(ListaNotasActivity.this, LinearLayoutManager.VERTICAL, false));
+            gravaLayoutPreferido(LAYOUT_LINEAR);
+        }
+
+        onPrepareOptionsMenu(menuActivity);
+        return true;
+    }
+
+    private String recuperarLayoutPreferido() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
+        return sharedPreferences.getString(LAYOUT_KEY, LAYOUT_LINEAR);
+    }
+
+    private void gravaLayoutPreferido(String layout) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
+        sharedPreferences.edit()
+                .putString(LAYOUT_KEY, layout)
+                .apply();
+    }
+
     private void altera(Nota nota, int posicao) {
         new NotaDAO().altera(posicao, nota);
         adapter.altera(posicao, nota);
@@ -130,7 +188,7 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private void configuraRecyclerView(List<Nota> todasNotas) {
-        RecyclerView listaNotas = findViewById(R.id.lista_notas_recyclerview);
+        listaNotas = findViewById(R.id.lista_notas_recyclerview);
         configuraAdapter(todasNotas, listaNotas);
         configuraItemTouchHelper(listaNotas);
     }

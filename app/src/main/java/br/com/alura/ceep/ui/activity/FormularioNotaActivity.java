@@ -7,11 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-
-import java.io.Serializable;
 
 import br.com.alura.ceep.R;
 import br.com.alura.ceep.model.Nota;
