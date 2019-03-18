@@ -124,15 +124,24 @@ public class ListaNotasActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.menu_formulario_lista_ic_grid) {
-            listaNotas.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-            gravaLayoutPreferido(LAYOUT_GRID);
+            mudaLayout(LAYOUT_GRID);
         } else if (item.getItemId() == R.id.menu_formulario_lista_ic_linear) {
-            listaNotas.setLayoutManager(new LinearLayoutManager(ListaNotasActivity.this, LinearLayoutManager.VERTICAL, false));
-            gravaLayoutPreferido(LAYOUT_LINEAR);
+            mudaLayout(LAYOUT_LINEAR);
         }
 
         onPrepareOptionsMenu(menuActivity);
         return true;
+    }
+
+    private void mudaLayout(String layout) {
+        RecyclerView.LayoutManager layoutManager;
+        if (layout.equals(LAYOUT_GRID))
+            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        else
+            layoutManager = new LinearLayoutManager(ListaNotasActivity.this, LinearLayoutManager.VERTICAL, false);
+
+        listaNotas.setLayoutManager(layoutManager);
+        gravaLayoutPreferido(layout);
     }
 
     private String recuperarLayoutPreferido() {
@@ -191,6 +200,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         listaNotas = findViewById(R.id.lista_notas_recyclerview);
         configuraAdapter(todasNotas, listaNotas);
         configuraItemTouchHelper(listaNotas);
+
+        mudaLayout(recuperarLayoutPreferido());
     }
 
     private void configuraItemTouchHelper(RecyclerView listaNotas) {
