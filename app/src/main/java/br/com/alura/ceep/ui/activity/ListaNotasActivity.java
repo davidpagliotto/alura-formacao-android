@@ -2,7 +2,6 @@ package br.com.alura.ceep.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,18 +19,17 @@ import br.com.alura.ceep.R;
 import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
 import br.com.alura.ceep.ui.recyclerview.adapter.ListaNotasAdapter;
-import br.com.alura.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 import br.com.alura.ceep.ui.recyclerview.helper.callback.NotaItemTouchHelperCallback;
+import br.com.alura.ceep.util.SharedPreferencesUtil;
 
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_POSICAO;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_NOTA;
-import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_GRID;
-import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_KEY;
-import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.LAYOUT_LINEAR;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.POSICAO_INVALIDA;
-import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.PREFERENCIAS;
+import static br.com.alura.ceep.util.SharedPreferencesUtil.LAYOUT_GRID;
+import static br.com.alura.ceep.util.SharedPreferencesUtil.LAYOUT_KEY;
+import static br.com.alura.ceep.util.SharedPreferencesUtil.LAYOUT_LINEAR;
 
 public class ListaNotasActivity extends AppCompatActivity {
 
@@ -145,15 +143,11 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private String recuperarLayoutPreferido() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
-        return sharedPreferences.getString(LAYOUT_KEY, LAYOUT_LINEAR);
+        return SharedPreferencesUtil.recuperaPreferencia(getApplication(), LAYOUT_KEY, LAYOUT_LINEAR);
     }
 
     private void gravaLayoutPreferido(String layout) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCIAS, MODE_PRIVATE);
-        sharedPreferences.edit()
-                .putString(LAYOUT_KEY, layout)
-                .apply();
+        SharedPreferencesUtil.gravarPreferencia(getApplication(), LAYOUT_KEY, layout);
     }
 
     private void altera(Nota nota, int posicao) {
@@ -213,7 +207,7 @@ public class ListaNotasActivity extends AppCompatActivity {
     private void configuraAdapter(List<Nota> todasNotas, RecyclerView listaNotas) {
         adapter = new ListaNotasAdapter(this, todasNotas);
         listaNotas.setAdapter(adapter);
-        adapter.setOnItemClickListener(new OnItemClickListener() {
+        adapter.setOnItemClickListener(new ListaNotasAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Nota nota, int posicao) {
                 vaiParaFormularioNotaActivityAltera(nota, posicao);

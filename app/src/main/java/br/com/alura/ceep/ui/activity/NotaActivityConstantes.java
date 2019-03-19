@@ -8,9 +8,4 @@ public interface NotaActivityConstantes {
     int POSICAO_INVALIDA = -1;
     String CHAVE_POSICAO = "posicao";
 
-    String LAYOUT_KEY = "layout";
-    String LAYOUT_LINEAR = "linear";
-    String LAYOUT_GRID = "grid";
-
-    String PREFERENCIAS = "br.com.alura.ceep.preferencia";
 }

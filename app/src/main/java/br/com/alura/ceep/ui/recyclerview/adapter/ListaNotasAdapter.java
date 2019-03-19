@@ -1,6 +1,8 @@
 package br.com.alura.ceep.ui.recyclerview.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +14,6 @@ import java.util.List;
 
 import br.com.alura.ceep.R;
 import br.com.alura.ceep.model.Nota;
-import br.com.alura.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 
 public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.NotaViewHolder> {
 
@@ -64,12 +65,14 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
 
     class NotaViewHolder extends RecyclerView.ViewHolder {
 
+        private final CardView cardView;
         private final TextView titulo;
         private final TextView descricao;
         private Nota nota;
 
         public NotaViewHolder(View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.cardView);
             titulo = itemView.findViewById(R.id.item_nota_titulo);
             descricao = itemView.findViewById(R.id.item_nota_descricao);
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +89,8 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
         }
 
         private void preencheCampo(Nota nota) {
+            cardView.setBackgroundColor(Color.parseColor(nota.getCorEnum().getCorHexa()));
+
             titulo.setText(nota.getTitulo());
             descricao.setText(nota.getDescricao());
         }
@@ -95,5 +100,12 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
         notas.add(nota);
         notifyDataSetChanged();
     }
+
+
+    public interface OnItemClickListener {
+
+        void onItemClick(Nota nota, int posicao);
+    }
+
 
 }
