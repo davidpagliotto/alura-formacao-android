@@ -6,16 +6,22 @@ import br.com.alura.ceep.enumerated.CorEnum;
 
 public class Nota implements Serializable{
 
+    private String id;
     private String titulo;
     private String descricao;
     private CorEnum corEnum;
+    private int posicao;
 
-    public Nota() { }
+    public Nota() {
+        corEnum = CorEnum.BRANCO;
+    }
 
-    public Nota(String titulo, String descricao) {
-        this.titulo = titulo;
-        this.descricao = descricao;
-        this.corEnum = CorEnum.BRANCO;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitulo() {
@@ -40,5 +46,13 @@ public class Nota implements Serializable{
 
     public void setCorEnum(CorEnum corEnum) {
         this.corEnum = corEnum;
+    }
+
+    public int getPosicao() {
+        return posicao;
+    }
+
+    public void setPosicao(int posicao) {
+        this.posicao = posicao;
     }
 }

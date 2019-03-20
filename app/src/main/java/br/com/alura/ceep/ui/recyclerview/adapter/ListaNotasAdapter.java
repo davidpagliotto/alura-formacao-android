@@ -13,16 +13,19 @@ import java.util.Collections;
 import java.util.List;
 
 import br.com.alura.ceep.R;
+import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
 
 public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.NotaViewHolder> {
 
     private final List<Nota> notas;
     private final Context context;
+    private NotaDAO notaDAO;
     private OnItemClickListener onItemClickListener;
 
     public ListaNotasAdapter(Context context, List<Nota> notas) {
         this.context = context;
+        this.notaDAO = new NotaDAO(context);
         this.notas = notas;
     }
 
@@ -48,18 +51,17 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
         return notas.size();
     }
 
-    public void altera(int posicao, Nota nota) {
-        notas.set(posicao, nota);
+    public void altera() {
         notifyDataSetChanged();
     }
 
     public void remove(int posicao) {
-        notas.remove(posicao);
+        Nota nota = notas.get(posicao);
+        notaDAO.remove(nota);
         notifyItemRemoved(posicao);
     }
 
     public void troca(int posicaoInicial, int posicaoFinal) {
-        Collections.swap(notas, posicaoInicial, posicaoFinal);
         notifyItemMoved(posicaoInicial, posicaoFinal);
     }
 
@@ -90,22 +92,17 @@ public class ListaNotasAdapter extends RecyclerView.Adapter<ListaNotasAdapter.No
 
         private void preencheCampo(Nota nota) {
             cardView.setBackgroundColor(Color.parseColor(nota.getCorEnum().getCorHexa()));
-
             titulo.setText(nota.getTitulo());
             descricao.setText(nota.getDescricao());
         }
     }
 
-    public void adiciona(Nota nota) {
-        notas.add(nota);
+    public void adiciona() {
         notifyDataSetChanged();
     }
 
-
     public interface OnItemClickListener {
-
         void onItemClick(Nota nota, int posicao);
     }
-
 
 }

@@ -1,5 +1,6 @@
 package br.com.alura.ceep.ui.recyclerview.helper.callback;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -9,9 +10,12 @@ import br.com.alura.ceep.ui.recyclerview.adapter.ListaNotasAdapter;
 public class NotaItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ListaNotasAdapter adapter;
+    private NotaDAO notaDAO;
 
-    public NotaItemTouchHelperCallback(ListaNotasAdapter adapter) {
+
+    public NotaItemTouchHelperCallback(Context context, ListaNotasAdapter adapter) {
         this.adapter = adapter;
+        notaDAO = new NotaDAO(context);
     }
 
     @Override
@@ -31,7 +35,7 @@ public class NotaItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     private void trocaNotas(int posicaoInicial, int posicaoFinal) {
-        new NotaDAO().troca(posicaoInicial, posicaoFinal);
+        notaDAO.trocaPosicao(posicaoInicial, posicaoFinal);
         adapter.troca(posicaoInicial, posicaoFinal);
     }
 
@@ -42,7 +46,6 @@ public class NotaItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     private void removeNota(int posicao) {
-        new NotaDAO().remove(posicao);
         adapter.remove(posicao);
     }
 }

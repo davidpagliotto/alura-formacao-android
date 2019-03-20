@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.facebook.stetho.Stetho;
+
 import java.util.List;
 
 import br.com.alura.ceep.R;
@@ -37,14 +39,16 @@ public class ListaNotasActivity extends AppCompatActivity {
     private ListaNotasAdapter adapter;
     private RecyclerView listaNotas;
     private Menu menuActivity;
+    private NotaDAO notaDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
-
+        Stetho.initializeWithDefaults(this);
         setTitle(TITULO_APPBAR);
 
+        notaDAO = new NotaDAO(this);
         List<Nota> todasNotas = pegaTodasNotas();
         configuraRecyclerView(todasNotas);
         configuraBotaoInsereNota();
@@ -61,28 +65,23 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private void vaiParaFormularioNotaActivityInsere() {
-        Intent iniciaFormularioNota =
-                new Intent(ListaNotasActivity.this,
-                        FormularioNotaActivity.class);
-        startActivityForResult(iniciaFormularioNota,
-                CODIGO_REQUISICAO_INSERE_NOTA);
+        Intent iniciaFormularioNota = new Intent(ListaNotasActivity.this, FormularioNotaActivity.class);
+        startActivityForResult(iniciaFormularioNota, CODIGO_REQUISICAO_INSERE_NOTA);
     }
 
     private List<Nota> pegaTodasNotas() {
-        NotaDAO dao = new NotaDAO();
-        return dao.todos();
+        return notaDAO.todasNotas();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (ehResultadoInsereNota(requestCode, data)) {
 
+        if (ehResultadoInsereNota(requestCode, data)) {
             if (resultadoOk(resultCode)) {
                 Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
                 adiciona(notaRecebida);
             }
-
         }
 
         if (ehResultadoAlteraNota(requestCode, data)) {
@@ -94,6 +93,7 @@ public class ListaNotasActivity extends AppCompatActivity {
                 }
             }
         }
+
     }
 
     @Override
@@ -106,7 +106,6 @@ public class ListaNotasActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-
         if (recuperarLayoutPreferido().equals(LAYOUT_LINEAR)) {
             menu.findItem(R.id.menu_formulario_lista_ic_linear).setVisible(false);
             menu.findItem(R.id.menu_formulario_lista_ic_grid).setVisible(true);
@@ -122,16 +121,16 @@ public class ListaNotasActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.menu_formulario_lista_ic_grid) {
-            mudaLayout(LAYOUT_GRID);
+            alterarLayoutListaNotas(LAYOUT_GRID);
         } else if (item.getItemId() == R.id.menu_formulario_lista_ic_linear) {
-            mudaLayout(LAYOUT_LINEAR);
+            alterarLayoutListaNotas(LAYOUT_LINEAR);
         }
 
         onPrepareOptionsMenu(menuActivity);
         return true;
     }
 
-    private void mudaLayout(String layout) {
+    private void alterarLayoutListaNotas(String layout) {
         RecyclerView.LayoutManager layoutManager;
         if (layout.equals(LAYOUT_GRID))
             layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -151,8 +150,8 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private void altera(Nota nota, int posicao) {
-        new NotaDAO().altera(posicao, nota);
-        adapter.altera(posicao, nota);
+        notaDAO.alteraPosicao(posicao, nota);
+        adapter.altera();
     }
 
     private boolean ehPosicaoValida(int posicaoRecebida) {
@@ -169,8 +168,8 @@ public class ListaNotasActivity extends AppCompatActivity {
     }
 
     private void adiciona(Nota nota) {
-        new NotaDAO().insere(nota);
-        adapter.adiciona(nota);
+        notaDAO.insere(nota);
+        adapter.adiciona();
     }
 
     private boolean ehResultadoInsereNota(int requestCode, Intent data) {
@@ -195,12 +194,11 @@ public class ListaNotasActivity extends AppCompatActivity {
         configuraAdapter(todasNotas, listaNotas);
         configuraItemTouchHelper(listaNotas);
 
-        mudaLayout(recuperarLayoutPreferido());
+        alterarLayoutListaNotas(recuperarLayoutPreferido());
     }
 
     private void configuraItemTouchHelper(RecyclerView listaNotas) {
-        ItemTouchHelper itemTouchHelper =
-                new ItemTouchHelper(new NotaItemTouchHelperCallback(adapter));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new NotaItemTouchHelperCallback(this, adapter));
         itemTouchHelper.attachToRecyclerView(listaNotas);
     }
 
