@@ -69,6 +69,11 @@ public class ListaNotasActivity extends AppCompatActivity {
         startActivityForResult(iniciaFormularioNota, CODIGO_REQUISICAO_INSERE_NOTA);
     }
 
+    private void vaiParaFormularioFeedback() {
+        Intent iniciaFormularioFeedbac = new Intent(ListaNotasActivity.this, FeedbackActivity.class);
+        startActivityForResult(iniciaFormularioFeedbac, CODIGO_REQUISICAO_INSERE_NOTA);
+    }
+
     private List<Nota> pegaTodasNotas() {
         return notaDAO.todasNotas();
     }
@@ -124,6 +129,8 @@ public class ListaNotasActivity extends AppCompatActivity {
             alterarLayoutListaNotas(LAYOUT_GRID);
         } else if (item.getItemId() == R.id.menu_formulario_lista_ic_linear) {
             alterarLayoutListaNotas(LAYOUT_LINEAR);
+        } else if (item.getItemId() == R.id.menu_formulario_lista_ic_feedback) {
+            vaiParaFormularioFeedback();
         }
 
         onPrepareOptionsMenu(menuActivity);
